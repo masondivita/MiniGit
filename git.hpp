@@ -21,6 +21,7 @@ class miniGit
   private:
     doublyNode* head;
     doublyNode* tail;
+    singlyNode* currHead;
 
   public:
     miniGit(){
