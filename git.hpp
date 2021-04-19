@@ -15,6 +15,13 @@ struct singlyNode{
     singlyNode* next;
 };
 
+struct Ht_item {
+    int key;
+    string fileName;
+    string fileVersion;
+    Ht_item* next;
+};
+
 
 class miniGit
 {
@@ -22,11 +29,12 @@ class miniGit
     doublyNode* head;
     doublyNode* tail;
     singlyNode* currHead;
+    Ht_item* HThead;
 
   public:
     miniGit(){
     	head = NULL;
-        tail = NULL;
+      tail = NULL;
     }
     ~miniGit();
     void addFiles(string fileName);

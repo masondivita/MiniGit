@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "git.hpp"
 
 using namespace std;
@@ -16,4 +18,23 @@ void miniGit::removeFiles(string fileName) {
         }
     }
     cout << "No file found!" << endl;
+}
+
+void hashKey (string fileName, string fileVersion) {
+    
+}
+
+void miniGit::commit () {
+    Ht_item* curr = HThead;
+
+    while(curr != NULL) {
+        if (HThead->key == )
+    }
+    
+    ifstream iFile();
+    string line;
+
+
+    while(getline(iFile, line)) {
+        stringstream ss(line);
 }
