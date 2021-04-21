@@ -29,12 +29,14 @@ class miniGit
     doublyNode* head;
     doublyNode* tail;
     singlyNode* currHead;
-    Ht_item* HThead;
+    Ht_item* HT[100];
 
   public:
     miniGit(){
     	head = NULL;
       tail = NULL;
+      currHead = NULL;
+      HT = new Ht_item;
     }
     ~miniGit();
     void addFiles(string fileName);
