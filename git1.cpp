@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
+
 #include "git.hpp"
 
 using namespace std;
@@ -17,8 +19,19 @@ void miniGit::removeFiles(string fileName) {
             curr = 0;
             return;
         }
+        curr = curr->next;
     }
     cout << "No file found!" << endl;
+}
+
+int convertToASCII(string name)
+{
+    int total = 0;
+    for (int i = 0; i < name.length(); i++)
+    {
+        total += name[i];
+    }
+    return total;
 }
 
 Ht_item hashKey (string fileName, string fileVersion) {
@@ -28,16 +41,6 @@ Ht_item hashKey (string fileName, string fileVersion) {
     nHTI->fileVersion = fileVersion;
     
     return *nHTI;
-}
-
-int convertToASCII(string name)
-{
-    int total;
-    for (int i = 0; i < name.length(); i++)
-    {
-        total += name[i];
-    }
-    return total;
 }
 
 string newFileVersion (string fileName, string oldfileVersion) {
@@ -57,6 +60,7 @@ string newFileVersion (string fileName, string oldfileVersion) {
     newVersion.close(); // closes the files
     toCommit.close();
 
+    return newFileVersion;
 }
 
 bool isNewVerion (string currFileName, string oldFileName) {
