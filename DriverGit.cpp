@@ -25,10 +25,12 @@ int main() {
                 break;
             }
             case 2: {
-                cout << "Enter the file name2222: " << endl;
-
-                string removeFileName;
-                getline(cin, removeFileName);
+                kermmit->removeFiles();
+                break;
+            }
+            case 3: {
+                kermmit->commit();
+                break;
             }
 
         }

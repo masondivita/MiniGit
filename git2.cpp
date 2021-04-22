@@ -20,6 +20,13 @@ void miniGit::addFiles(){
 
     string file;
     cin >> file;
+
+
+    singlyNode* nn = new singlyNode;
+    nn->fileName = file;
+    nn->fileVersion = "";
+    currHead = nn;
+
     ifstream in_file(file);
 
     if (in_file.fail()){
@@ -29,5 +36,5 @@ void miniGit::addFiles(){
     if(search(file, currHead)){
         cout << "File already exists in directory." << endl;
     }
-
+    
 }

@@ -8,15 +8,24 @@
 using namespace std;
 
 
-void miniGit::removeFiles(string fileName) {
+void miniGit::removeFiles() {
+    cout << "Enter the file name: " << endl;
+    string fileName;
+    cin >> fileName;
+
     singlyNode* curr = currHead;
     singlyNode* prev = NULL;
 
     while(curr != NULL) {
         if (curr->fileName == fileName) {
-            prev->next = curr->next;
+            if (prev == NULL) {
+                currHead = NULL;   
+            }
+            else {
+                prev->next = curr->next;
+            }
             delete curr;
-            curr = 0;
+            curr = NULL;
             return;
         }
         curr = curr->next;
@@ -34,23 +43,20 @@ int convertToASCII(string name)
     return total;
 }
 
-Ht_item hashKey (string fileName, string fileVersion) {
-    Ht_item* nHTI = new Ht_item;
-    int fileASCII = convertToASCII(fileName);
-    nHTI->key = fileASCII % 416;
-    nHTI->fileVersion = fileVersion;
-    
-    return *nHTI;
-}
-
 string newFileVersion (string fileName, string oldfileVersion) {
-    int fileASCII = convertToASCII(oldfileVersion); // receives the version number as an int
-    // if (fileASCII < 10) "file0" + ...
-    string newFileVersion = "file" + to_string((fileASCII % 416) + 1) + ".cpp"; // gets the next version name
-    
+    string newFileVersion = "";
+    if (oldfileVersion == "") {
+        newFileVersion = "__00__" + fileName;
+    }
+    else {
+        int fileASCII = convertToASCII(oldfileVersion); // receives the version number as an int
+        // if (fileASCII < 10) "file0" + ...
+        newFileVersion = "__" + to_string((fileASCII - 1194) % 96) + "__" + fileName; // gets the next version name
+    }
+
     ofstream newVersion(newFileVersion); // creates and opens the new version file
 
-    ifstream toCommit(fileName + ".cpp"); // opens the file that is being commited
+    ifstream toCommit(fileName); // opens the file that is being commited
     string line;
 
     while(getline(toCommit, line)) { // copies line by line
@@ -63,17 +69,41 @@ string newFileVersion (string fileName, string oldfileVersion) {
     return newFileVersion;
 }
 
+Ht_item* hashKey (string fileName, string fileVersion) {
+    Ht_item* nHTI = new Ht_item;
+    int fileASCII = convertToASCII(fileName);
+    nHTI->key = (fileASCII - 814) % 48;
+    nHTI->fileVersion = newFileVersion(fileName, fileVersion);
+    
+    return nHTI;
+}
+
 bool isNewVerion (string currFileName, string oldFileName) {
-    ifstream currFile(currFileName + ".cpp"); // opens the file that is being commited
-    ifstream oldFile(oldFileName + ".cpp"); // opens old file
+    ifstream currFile(currFileName); // opens the file that is being commited
+    ifstream oldFile(oldFileName); // opens old file
     string line;
     string oldLine;
 
-    while(getline(currFile, line) && getline(oldFile, oldLine)) { // copies line by line
+    while(!currFile.eof() || !oldFile.eof()) { // copies line by line
+        currFile >> line;
+        oldFile >> oldLine;
         if (line != oldLine) {
+            cout << "true" << endl;
+            currFile.close();
+            oldFile.close();
             return true;
         }
     }
+    if (!(currFile.eof() && oldFile.eof())) {
+        cout << "true" << endl;
+        currFile.close();
+        oldFile.close();
+        return true;
+    }
+
+    currFile.close();
+    oldFile.close();
+    cout << "false" << endl;
     return false;
 }
 
@@ -85,33 +115,54 @@ void miniGit::commit () {
         singlyNode* curr = currHead;
         int i = 0;
 
-        while (curr != NULL) {
-            HT[0] = hashKey(curr->fileName, curr->fileVersion);
+        while (curr != NULL) { // creates a new version of the file
+            HT[i] = *hashKey(curr->fileName, curr->fileVersion); // adds this file to the hash table at index file#
             curr = curr->next;
+            i++;
         }
+
         doublyNode* nn = new doublyNode;
         nn->commitNumber = 0;
-        nn->head = currHead;
-        currHead = NULL;
+
+        curr = currHead;
+        int j = 0;
+
+        while (curr != NULL) {
+            singlyNode* nsn = new singlyNode;
+            if (j == 0) {
+             nn->head = nsn;
+             j++;   
+            }
+            nsn->fileName = curr->fileName;
+            nsn->fileVersion = curr->fileVersion;
+            nsn->next = curr->next;
+
+            curr = curr->next;
+        }
+
         nn->previous = NULL;
         head = nn;
         tail = nn;
     }
     else {
-        singlyNode* currSingle = tail->head;
+        singlyNode* currSingle = currHead;
 
         while (currSingle != NULL) {
-            if (isNewVerion(currHead->fileName, HT[convertToASCII(currSingle->fileName)].fileVersion)) {
-                Ht_item* nHTI = new Ht_item;
-
-                nHTI->fileVersion = newFileVersion(currSingle->fileName, currSingle->fileVersion);
-                HT[convertToASCII(currSingle->fileName)].next = nHTI;
+            Ht_item* currHTI = &HT[((convertToASCII(currSingle->fileName) - 814) % 48)];
+            
+            while (currHTI->next != NULL) {
+                currHTI = currHTI->next;
             }
+
+            string oldFileVerion = currHTI->fileVersion;
+            cout << oldFileVerion << endl;
+            if (isNewVerion(currSingle->fileName, oldFileVerion)) {
+                Ht_item* nHTI = hashKey(currSingle->fileName, oldFileVerion);
+                
+                currHTI->next = nHTI;
+                
+            }
+            currSingle = currSingle->next;
         }
-
     }
-
-    
-    
-    
 }

@@ -44,7 +44,7 @@ class miniGit {
     }
     ~miniGit();
     void addFiles();
-    void removeFiles(string fileName);
+    void removeFiles();
     void commit();
     void checkout(int version);
     
