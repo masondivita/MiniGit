@@ -55,12 +55,10 @@ void miniGit::addFiles(){
 
 void checkoutFile(string fileName, string fileVersion){
     ofstream currFile(fileName);
-    ifstream oldFile(fileVersion);
+    ifstream oldFile(".minigit/" + fileVersion);
     string line;
-    string oldLine;
 
-    while(!oldFile.eof()) { // copies line by line
-        oldFile >> oldLine;
+    while(getline(oldFile, line)) {
         currFile << line << endl;
     }
 
@@ -68,8 +66,9 @@ void checkoutFile(string fileName, string fileVersion){
     currFile.close();
 }
 
-void miniGit::checkout(int version){
+void miniGit::checkout(){
     doublyNode *node = head;
+    int version;
     cout << "Warning: Files in current directtory will be overwritten" << endl;
     cout << "Enter commit number: " << endl;
     cin >> version;
@@ -78,7 +77,6 @@ void miniGit::checkout(int version){
         return;
     }
     while(node){
-        node = node->next;
         if(node->commitNumber == version){
             singlyNode *curr = currHead;
             while(curr){
@@ -86,6 +84,7 @@ void miniGit::checkout(int version){
                 curr = curr->next;
             }
         }
+        node = node->next;
     }
 }
 

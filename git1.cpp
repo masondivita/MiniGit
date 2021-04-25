@@ -99,24 +99,25 @@ Ht_item* newHTI (string fileName, string fileVersion) {
 
 bool isNewVerion (string currFileName, string oldFileName) {
     ifstream currFile(currFileName); // opens the file that is being commited
-    ifstream oldFile(oldFileName); // opens old file
+    ifstream oldFile(".minigit/" + oldFileName); // opens old file
     string line;
     string oldLine;
 
-    while(!currFile.eof() && !oldFile.eof()) { // copies line by line
+    while(!currFile.eof() & !oldFile.eof()) { // copies line by line
+
         currFile >> line;
         oldFile >> oldLine;
+        
         if (line != oldLine) {
-            cout << "true" << endl;
             currFile.close();
             oldFile.close();
+            cout << "true" << endl;
             return true;
         }
     }
-
+    cout << "false" << endl;
     currFile.close();
     oldFile.close();
-    cout << "false" << endl;
     return false;
 }
 
@@ -132,7 +133,7 @@ void miniGit::commit () {
         
 
         while (curr != NULL) { // creates new versions of the files
-            HT[hashFunction(curr->fileName)] = *newHTI(curr->fileName, curr->fileVersion); // adds this file to the hash table at index file#
+            HT[hashFunction(curr->fileName)] = *newHTI(curr->fileName, ""); // adds this file to the hash table at index file#
 
             curr->fileVersion = HT[hashFunction(curr->fileName)].fileVersion;
             curr = curr->next;
@@ -167,7 +168,7 @@ void miniGit::commit () {
 
         while (currSingle != NULL) { // goes through all the files that will be commited to see if they are new versions
             if (&HT[hashFunction(currSingle->fileName)] == NULL) { // checks if this is the first version of this file
-                HT[hashFunction(currSingle->fileName)] = *newHTI(currSingle->fileName, currSingle->fileVersion); // adds it as new to the hash table
+                HT[hashFunction(currSingle->fileName)] = *newHTI(currSingle->fileName, ""); // adds it as new to the hash table
                 currSingle->fileVersion = HT[hashFunction(currSingle->fileName)].fileVersion;
             } else {
 
@@ -180,7 +181,7 @@ void miniGit::commit () {
                     test = test->next;
                 }
 
-                string oldFileVerion = currHTI->fileVersion;
+                string oldFileVerion = currHTI->fileVersion; // gets the last updated file version
 
                 if (isNewVerion(currSingle->fileName, oldFileVerion)) { // checks if the file being commited is a new verion, if it isnt, it wont be commited
                     Ht_item* nHTI = newHTI(currSingle->fileName, oldFileVerion);
@@ -189,7 +190,7 @@ void miniGit::commit () {
                 
                 }
             }
-            
+
             currSingle = currSingle->next;
         }
 

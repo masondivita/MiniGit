@@ -32,6 +32,10 @@ int main() {
                 kermmit->commit();
                 break;
             }
+            case 4: {
+                kermmit->checkout();
+                break;
+            }
 
         }
     }
