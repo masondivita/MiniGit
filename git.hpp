@@ -35,21 +35,20 @@ class miniGit {
     doublyNode* head;
     doublyNode* tail;
     singlyNode* currHead;
-    Ht_item* HT;
+    Ht_item** HT;
 
   public:
     miniGit(){
     	head = NULL;
       tail = NULL;
       currHead = NULL;
-      HT = new Ht_item[100];
+      HT = new Ht_item*[100];
     }
     ~miniGit();
     void addFiles();
     void removeFiles();
     void commit();
     void checkout();
-    
 };
 
 

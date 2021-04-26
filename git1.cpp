@@ -11,7 +11,43 @@ using namespace std;
 
 
 miniGit::~miniGit () {
-    
+    singlyNode* curr = currHead;
+    singlyNode* prev = NULL;
+
+    while (curr != NULL) { // clears the current files linked list
+        prev = curr;
+        curr = curr->next;
+        delete prev;
+    }
+
+    doublyNode* currDouble = head;
+    doublyNode* prevDouble = NULL;
+
+    while (currDouble != NULL) {// clears all the commits
+        prevDouble = currDouble;
+        curr = prevDouble->head;
+        while (curr != NULL) { // clears the old commit linked lists
+            prev = curr;
+            curr = curr->next;
+            delete prev;
+        }
+        currDouble = currDouble->next;
+        delete prevDouble;
+    }
+
+    for (int i = 0; i < 101; i++) { // clears the linked lists of hash table items (the fileversions)
+        Ht_item* currHTI = HT[i];
+        Ht_item* prevHTI = NULL;
+
+        while (currHTI != NULL) {
+            prevHTI = currHTI;
+            currHTI = currHTI->next;
+            delete prevHTI;
+        }
+    }
+
+    delete[] HT;
+    fs::remove_all(".minigit");
 }
 
 void miniGit::removeFiles () {
@@ -22,7 +58,7 @@ void miniGit::removeFiles () {
     singlyNode* curr = currHead;
     singlyNode* prev = NULL;
 
-    while(curr != NULL) {
+    while(curr != NULL) { // traverses through the linked list looking for the file
         if (curr->fileName == fileName) {
             if (prev == NULL) {
                 currHead = NULL;   
@@ -39,7 +75,7 @@ void miniGit::removeFiles () {
     cout << "No file found!" << endl;
 }
 
-int convertToASCII (string name) {
+int convertToASCII (string name) { // converts some string to the sum of its ascii character values
     int total = 0;
     for (int i = 0; i < name.length(); i++)
     {
@@ -48,11 +84,11 @@ int convertToASCII (string name) {
     return total;
 }
 
-int fileVersionKey (string name) {
+int fileVersionKey (string name) { // extracts the version number
     return stoi((to_string(name[2] % 48) + to_string(name[3] % 48)));
 }
 
-int hashFunction (string fileName) {
+int hashFunction (string fileName) { // extracts the file number
     return ((convertToASCII(fileName) - 814) % 48);
 }
 
@@ -69,7 +105,6 @@ string newFileVersion (string fileName, string oldfileVersion) {
         else {
             newFileVersion = "__" + to_string(fileASCII + 1) + "__" + fileName; // gets the next version name
         }
-        
     }
 
     ofstream newVersion(".minigit/" + newFileVersion); // creates and opens the new version file
@@ -88,7 +123,7 @@ string newFileVersion (string fileName, string oldfileVersion) {
     return newFileVersion;
 }
 
-Ht_item* newHTI (string fileName, string fileVersion) {
+Ht_item* newHTI (string fileName, string fileVersion) { // creates a new ash tabel item
     Ht_item* nHTI = new Ht_item;
     nHTI->key = hashFunction(fileName);
     nHTI->fileVersion = newFileVersion(fileName, fileVersion);
@@ -103,28 +138,23 @@ bool isNewVerion (string currFileName, string oldFileName) {
     string line;
     string oldLine;
 
-    while(!currFile.eof() & !oldFile.eof()) { // copies line by line
+    while(!currFile.eof() & !oldFile.eof()) { // goes through both files at the same time
 
         currFile >> line;
         oldFile >> oldLine;
         
-        if (line != oldLine) {
+        if (line != oldLine) { // if the there is a difference in the lines, it returns true
             currFile.close();
             oldFile.close();
-            cout << "true" << endl;
             return true;
         }
     }
-    cout << "false" << endl;
     currFile.close();
     oldFile.close();
     return false;
 }
 
 void miniGit::commit () {
-    // array of HT, with newst version at the end of linked list for each 'fileName'
-    // compares, line by line, the inside of the files for the new commits and latest version
-    // if not the same, add a new node and add the file to .git dir
     if (head == NULL) {
         singlyNode* curr = currHead;
 
@@ -133,9 +163,9 @@ void miniGit::commit () {
         
 
         while (curr != NULL) { // creates new versions of the files
-            HT[hashFunction(curr->fileName)] = *newHTI(curr->fileName, ""); // adds this file to the hash table at index file#
+            HT[hashFunction(curr->fileName)] = newHTI(curr->fileName, ""); // adds this file to the hash table at index file#
 
-            curr->fileVersion = HT[hashFunction(curr->fileName)].fileVersion;
+            curr->fileVersion = HT[hashFunction(curr->fileName)]->fileVersion;
             curr = curr->next;
         }
 
@@ -145,10 +175,10 @@ void miniGit::commit () {
         curr = currHead;
         int j = 0;
 
-        while (curr != NULL) {
+        while (curr != NULL) { // copies the single linked list and saves it in the commit
             singlyNode* nsn = new singlyNode;
             if (j == 0) {
-             nn->head = nsn;
+             nn->head = nsn; // sets the first new node as the head
              j++;   
             }
             nsn->fileName = curr->fileName;
@@ -167,13 +197,13 @@ void miniGit::commit () {
         singlyNode* currSingle = currHead;
 
         while (currSingle != NULL) { // goes through all the files that will be commited to see if they are new versions
-            if (&HT[hashFunction(currSingle->fileName)] == NULL) { // checks if this is the first version of this file
-                HT[hashFunction(currSingle->fileName)] = *newHTI(currSingle->fileName, ""); // adds it as new to the hash table
-                currSingle->fileVersion = HT[hashFunction(currSingle->fileName)].fileVersion;
+            if (HT[hashFunction(currSingle->fileName)] == NULL) { // checks if this is the first version of this file
+                HT[hashFunction(currSingle->fileName)] = newHTI(currSingle->fileName, ""); // adds it as new to the hash table
+                currSingle->fileVersion = HT[hashFunction(currSingle->fileName)]->fileVersion;
             } else {
 
                 Ht_item* currHTI = NULL; // grabs the first file version from the hash table that coresponds to the current file
-                Ht_item* test = &HT[hashFunction(currSingle->fileName)]; // test just fixes a seg fault error, it is only used for the following while loop
+                Ht_item* test = HT[hashFunction(currSingle->fileName)]; // test just fixes a seg fault error, it is only used for the following while loop
 
             
                 while (test != NULL) { // goes to the last file version from the hash table
@@ -183,7 +213,7 @@ void miniGit::commit () {
 
                 string oldFileVerion = currHTI->fileVersion; // gets the last updated file version
 
-                if (isNewVerion(currSingle->fileName, oldFileVerion)) { // checks if the file being commited is a new verion, if it isnt, it wont be commited
+                if (isNewVerion(currSingle->fileName, oldFileVerion)) { // checks if the file being commited is a new verion, if it isnt, a new version wont be created
                     Ht_item* nHTI = newHTI(currSingle->fileName, oldFileVerion);
                 
                     currHTI->next = nHTI;
@@ -232,3 +262,4 @@ void miniGit::commit () {
         tail = nn;
     }
 }
+
