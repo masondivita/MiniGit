@@ -134,6 +134,6 @@ void miniGit::checkout(){
     if(version != tail->commitNumber){
         cout << "Current directory is not most recent directory." << endl;
         cout << "Please checkout most recent directory to access other menu options." << endl;
-        commit();
+        checkout();
     }
 }
