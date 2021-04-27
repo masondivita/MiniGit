@@ -101,7 +101,7 @@ bool miniGit::checkout(){
     doublyNode *node = head;
 
     cout << "Warning: Files in current directory will be overwritten" << endl;
-    cout << "Enter commit number: " << endl << endl;
+    cout << "Enter commit number: " << endl;
 
     cin >> version;
 
