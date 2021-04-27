@@ -44,76 +44,71 @@ bool isMostRecentCommit(int version, doublyNode* head){
     return false;
 }*/
 
-void miniGit::addFiles(string fileName, string fileVersion){
+void miniGit::addFiles(){
     
-    cout << "Enter the file name: " << endl;
-
     string file;
-    getline(cin, file);
+    cout << "Enter the file name: " << endl;
+    cin >> file;
+    
     ifstream in_file(file);
 
+    string fileVersion = "__00__" + file;
+
     if (in_file.fail()){
-        cout << "File not found. Please enter valid filename." << endl;
+        cout << "File not found. Please enter valid filename." << endl << endl;
     }
 
-    if(search(fileName, currHead)){
-        cout << "File already exists in directory." << endl;
-    }
-
-     if(currHead == NULL){
-        currHead = new singlyNode;
-        currHead->fileName = fileName;
-        currHead->next = NULL;
-        currHead->fileVersion = fileVersion;
-
-    } else {
-        singlyNode* last = currHead;
-        
-        while(last->next){
-            
-            last = last->next;
+        if(search(file, currHead)){
+            cout << "File already exists in directory." << endl;
         }
-        
-        last->fileName = fileName;
-        last->fileVersion = fileVersion;
-    }
+
+        if(currHead == NULL){
+            currHead = new singlyNode;
+            currHead->fileName = file;
+            currHead->next = NULL;
+            currHead->fileVersion = fileVersion;
+
+        } else {
+            singlyNode* last = currHead;
+            
+            while(last->next){
+                
+                last = last->next;
+            }
+            
+            last->fileName = file;
+            last->fileVersion = fileVersion;
+        }
 }
 
-string checkoutFile(string fileName, string fileVersion){
-        
-    ofstream fileName(fileName);
-    ifstream fileVersion(fileVersion);
-        
+void checkoutFile(string fileName, string fileVersion){
+    ofstream currFile(fileName);
+    ifstream oldFile(".minigit/" + fileVersion);
     string line;
 
-    while(getline(fileVersion, line)){
-            
-        fileName << line << endl;
+    while(getline(oldFile, line)) {
+        currFile << line << endl;
     }
 
-    fileVersion.close();
-    fileName.close();
-
-    return fileName;
-
-
+    oldFile.close();
+    currFile.close();
 }
 
 
-void miniGit::checkout(){
+bool miniGit::checkout(){
 
-    int version = tail->commitNumber;
+    int version = 0;
     doublyNode *node = head;
 
     cout << "Warning: Files in current directory will be overwritten" << endl;
-    cout << "Enter commit number: " << endl;
+    cout << "Enter commit number: " << endl << endl;
 
     cin >> version;
 
     if(head == NULL){
 
         cout << "No previous file version availible." << endl;
-        return;
+        return true;
     }
         
     while(node){
@@ -131,9 +126,11 @@ void miniGit::checkout(){
         node = node->next;
     }
 
-    if(version != tail->commitNumber){
+    if(version == tail->commitNumber){
+        return true;
+    } else {
         cout << "Current directory is not most recent directory." << endl;
-        cout << "Please checkout most recent directory to access other menu options." << endl;
-        checkout();
+        cout << "Please checkout most recent directory to access other menu options." << endl << endl;
+        return false;  
     }
 }

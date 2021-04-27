@@ -33,7 +33,9 @@ int main() {
                 break;
             }
             case 4: {
-                kermmit->checkout();
+                while(!kermmit->checkout()){
+                    kermmit->checkout();
+                }
                 break;
             }
 
