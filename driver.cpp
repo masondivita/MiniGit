@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "git.hpp"
+#include "miniGit.hpp"
 
 using namespace std;
 

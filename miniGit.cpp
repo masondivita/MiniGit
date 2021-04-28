@@ -4,7 +4,7 @@
 #include <string>
 #include <filesystem>
 
-#include "git.hpp"
+#include "miniGit.hpp"
 
 namespace fs = std::filesystem;
 using namespace std;
