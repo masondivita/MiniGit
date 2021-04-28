@@ -157,6 +157,11 @@ bool isNewVerion (string currFileName, string oldFileName) {
 void miniGit::commit () {
     if (head == NULL) {
         singlyNode* curr = currHead;
+        
+        if (currHead == NULL) {
+            cout << "No files to commit!" << endl; 
+            return;
+        }
 
         fs::remove_all(".minigit");
         fs::create_directory(".minigit");
@@ -215,6 +220,7 @@ void miniGit::commit () {
 
                 if (isNewVerion(currSingle->fileName, oldFileVerion)) { // checks if the file being commited is a new verion, if it isnt, a new version wont be created
                     Ht_item* nHTI = newHTI(currSingle->fileName, oldFileVerion);
+                    currSingle->fileVersion = nHTI->fileVersion;
                 
                     currHTI->next = nHTI;
                 

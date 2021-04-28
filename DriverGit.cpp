@@ -22,20 +22,25 @@ int main() {
         switch(option){
             case 1: {
                 kermmit->addFiles();
+                cout << "--------------------" << endl;
                 break;
             }
             case 2: {
                 kermmit->removeFiles();
+                cout << "--------------------" << endl;
                 break;
             }
             case 3: {
                 kermmit->commit();
+                cout << "--------------------" << endl;
                 break;
             }
             case 4: {
-                while(!kermmit->checkout()){
-                    kermmit->checkout();
+                bool currCommit = false;
+                while(!currCommit){
+                    currCommit = kermmit->checkout();
                 }
+                cout << "--------------------" << endl;
                 break;
             }
 
